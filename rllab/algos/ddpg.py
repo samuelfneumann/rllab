@@ -209,12 +209,17 @@ class DDPG(RLAlgorithm):
 
         sample_policy = pickle.loads(pickle.dumps(self.policy))
 
+        episode_returns = []
+        episode_lengths = []
+
         for epoch in range(self.n_epochs):
             logger.push_prefix('epoch #%d | ' % epoch)
             logger.log("Training started")
             for epoch_itr in pyprind.prog_bar(range(self.epoch_length)):
                 # Execute policy
                 if terminal:  # or path_length > self.max_path_length:
+                    episode_returns.append(path_return)
+                    episode_lengths.append(path_length)
                     # Note that if the last time step ends an episode, the very
                     # last state and observation will be ignored and not added
                     # to the replay pool
@@ -222,8 +227,11 @@ class DDPG(RLAlgorithm):
                     self.es.reset()
                     sample_policy.reset()
                     self.es_path_returns.append(path_return)
+
                     path_length = 0
                     path_return = 0
+
+
                 action = self.es.get_action(itr, observation, policy=sample_policy)  # qf=qf)
 
                 next_observation, reward, terminal, _ = self.env.step(action)
@@ -249,6 +257,11 @@ class DDPG(RLAlgorithm):
 
                 itr += 1
 
+            if terminal:
+                episode_returns.append(path_return)
+                episode_lengths.append(path_length)
+
+
             logger.log("Training finished")
             if pool.size >= self.min_pool_size:
                 self.evaluate(epoch, pool)
@@ -263,6 +276,15 @@ class DDPG(RLAlgorithm):
                               "continue...")
         self.env.terminate()
         self.policy.terminate()
+
+        print(episode_lengths)
+        print(episode_returns)
+
+        print(len(episode_lengths))
+        print(len(episode_returns))
+        print(sum(episode_lengths))
+
+        return episode_returns, episode_lengths
 
     def init_opt(self):
 

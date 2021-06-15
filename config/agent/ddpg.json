@@ -1,0 +1,22 @@
+{
+	"agent": "ddpg",
+	"problem": "acrobot",
+	"max_steps": 3000,
+	"metaParameters": {
+		"batch_size": 32,
+		"replay_pool_size": 1000000,
+		"epoch_length": [1000],
+		"max_path_length": [250],
+		"n_epochs": 3,
+		"discount": 0.99,
+		"qf_learning_rate": [1e-4, 1e-3, 1e-2],
+		"policy_learning_scale": [1.0, 0.1, 0.01],
+		"target_update": [[0.001, 1]],
+		"n_updates_per_sample": 1,
+		"critic_weights": [[32, 32]],
+		"actor_weights": [[32, 32]],
+		"sigma": [0.1],
+		"mu": 0.0,
+		"theta": 0.15
+	}
+}
