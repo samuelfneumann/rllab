@@ -1,4 +1,5 @@
 data
+venv
 *.pyc
 *-checkpoint.ipynb
 .DS_Store
