@@ -61,7 +61,7 @@ def exp_name(perm):
 
 
 def run_task(*_):
-    env = env_registry.get("cartpole")
+    env = env_registry.get(perm["problem"])
 
     algo = agent_registry.get(perm, env)
 

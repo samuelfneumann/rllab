@@ -484,7 +484,6 @@ def run_experiment_lite(
                 script=osp.join(config.PROJECT_PATH, script),
                 use_gpu=use_gpu
             )
-            print(command)
             if dry:
                 return
             try:
