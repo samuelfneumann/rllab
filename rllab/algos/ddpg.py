@@ -108,6 +108,7 @@ class DDPG(RLAlgorithm):
             eval_samples=10000,
             soft_target=True,
             soft_target_tau=0.001,
+            target_update_steps=1,
             n_updates_per_sample=1,
             scale_reward=1.0,
             include_horizon_terminal_transitions=False,
@@ -167,7 +168,13 @@ class DDPG(RLAlgorithm):
             )
         self.policy_learning_rate = policy_learning_rate
         self.eval_samples = eval_samples
+
+        self.num_steps = 0
+        self.target_update_steps = target_update_steps
+        self.soft_target = soft_target
         self.soft_target_tau = soft_target_tau
+
+
         self.n_updates_per_sample = n_updates_per_sample
         self.include_horizon_terminal_transitions = include_horizon_terminal_transitions
         self.plot = plot
@@ -237,6 +244,7 @@ class DDPG(RLAlgorithm):
                 next_observation, reward, terminal, _ = self.env.step(action)
                 path_length += 1
                 path_return += reward
+                self.num_steps += 1
 
                 if not terminal and path_length >= self.max_path_length:
                     terminal = True
@@ -374,12 +382,14 @@ class DDPG(RLAlgorithm):
 
         policy_surr = f_train_policy(obs)
 
-        target_policy.set_param_values(
-            target_policy.get_param_values() * (1.0 - self.soft_target_tau) +
-            self.policy.get_param_values() * self.soft_target_tau)
-        target_qf.set_param_values(
-            target_qf.get_param_values() * (1.0 - self.soft_target_tau) +
-            self.qf.get_param_values() * self.soft_target_tau)
+        if self.num_steps % self.target_update_steps == 0:
+            self.num_steps = 0
+            target_policy.set_param_values(
+                target_policy.get_param_values() * (1.0 - self.soft_target_tau) +
+                self.policy.get_param_values() * self.soft_target_tau)
+            target_qf.set_param_values(
+                target_qf.get_param_values() * (1.0 - self.soft_target_tau) +
+                self.qf.get_param_values() * self.soft_target_tau)
 
         self.qf_loss_averages.append(qf_loss)
         self.policy_surr_averages.append(policy_surr)
