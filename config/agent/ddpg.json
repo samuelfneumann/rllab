@@ -1,6 +1,6 @@
 {
 	"agent": "ddpg",
-	"problem": "mountain car",
+	"problem": "pendulum",
 	"max_steps": 3000,
 	"metaParameters": {
 		"batch_size": 32,
