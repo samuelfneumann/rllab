@@ -13,9 +13,6 @@ from pprint import pprint
 import os
 sys.path.append(os.getcwd())
 
-# TODO:
-#   target net averaging
-
 
 if len(sys.argv) < 2:
     print('run again with:')
@@ -38,8 +35,6 @@ base = './' if len(sys.argv) >= 3 else sys.argv[3]
 perm = exp.getPermutation(idx)
 hps = perm["metaParameters"]
 pprint(perm)
-if perm["max_steps"] != hps["n_epochs"] * hps["epoch_length"]:
-    raise ValueError("max steps is not set to equal epochs * epoch length")
 
 # Get the maximum number of steps for training and the run number
 max_steps = exp.max_steps
@@ -51,17 +46,17 @@ np.random.seed(run)
 tf.random.set_seed(run)
 
 
-def exp_name(perm):
+def exp_name(perm, run):
     hps = perm["metaParameters"]
     agent = perm["agent"]
     env = perm["problem"]
     hp_list = list(map(lambda x: str(x), hps.values()))
-    hp_list = ",".join(hp_list)
-    return agent + "," + env + "," + hp_list
+    hp_list = "-".join(hp_list)
+    return agent + "," + env + "," + hp_list + f"Run{run}"
 
 
 def run_task(*_):
-    env = env_registry.get(perm["problem"])
+    env = env_registry.get(perm)
 
     algo = agent_registry.get(perm, env)
 
@@ -74,15 +69,17 @@ run_experiment_lite(
     n_parallel=1,
     snapshot_mode="last",
     seed=run,
-    exp_name=exp_name(perm)
+    exp_name=exp_name(perm, run)
 )
 cpu_time = time.time() - start
 
-if not os.path.exists(f"./data/local/experiment/{exp_name(perm)}"):
+if not os.path.exists(f"./data/local/experiment/{exp_name(perm, run)}"):
     os.mkdir(f"./data/local/experiment/{exp_name(perm)}")
 
-with open(f"./data/local/experiment/{exp_name(perm)}/config.json", "w") as outfile:
+file_ = f"./data/local/experiment/{exp_name(perm, run)}/config.json"
+with open(file_, "w") as outfile:
     json.dump(perm, outfile, indent=4)
 
-with open(f"./data/local/experiment/{exp_name(perm)}/cpu_time", "w") as outfile:
+file_ = f"./data/local/experiment/{exp_name(perm, run)}/cpu_time"
+with open(file_, "w") as outfile:
     outfile.write(str(cpu_time))
