@@ -91,11 +91,12 @@ def gatherMissing(experiment_paths, runs, groupSize, cores, total_hours):
         perm = None
         while perm != firstPerm:
             numPerms += 1
+            perm = exp.getPermutation(numPerms)
 
         for i in range(numPerms * runs):
             perm = exp.getPermutation(i)
             run = i % numPerms
-            name = get_name(perm, run)
+            name = exp_name(perm, run)
             if not os.path.exists(f"./data/local/experiment/{name}"):
                 indices.append(i)
 
