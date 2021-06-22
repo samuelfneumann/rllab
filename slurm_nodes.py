@@ -9,7 +9,6 @@ import PyExpUtils.runner.parallel as Parallel
 from PyExpUtils.results.backends.h5 import detectMissingIndices
 from PyExpUtils.utils.generator import group
 import ExperimentModel
-import main
 
 if len(sys.argv) < 4:
     print('Please run again using')
@@ -57,6 +56,15 @@ def printProgress(size, it):
             print()
         yield _
 
+def exp_name(perm, run):
+    hps = perm["metaParameters"]
+    agent = perm["agent"]
+    env = perm["problem"]
+    hp_list = list(map(lambda x: str(x), hps.values()))
+    hp_list = "-".join(hp_list)
+    return agent + "," + env + "," + hp_list + f"Run{run}"
+
+
 def estimateUsage(indices, groupSize, cores, hours):
     jobs = math.ceil(len(indices) / groupSize)
 
@@ -87,7 +95,7 @@ def gatherMissing(experiment_paths, runs, groupSize, cores, total_hours):
         for i in range(numPerms * runs):
             perm = exp.getPermutation(i)
             run = i % numPerms
-            name = main.getName(perm, run)
+            name = get_name(perm, run)
             if not os.path.exists(f"./data/local/experiment/{name}"):
                 indices.append(i)
 
