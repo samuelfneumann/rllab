@@ -7,7 +7,7 @@
 		"batch_size": 50000,
 		"n_itr": 500,
 		"discount": 0.99,
-		"stepsize": [1e-3],
+		"stepsize": [1e-4, 1e-3, 1e-2, 1e-1],
 		"policy_weights": [[100, 50, 25]],
 		"discount": 0.99
 	}
