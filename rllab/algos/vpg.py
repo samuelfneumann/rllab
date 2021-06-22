@@ -120,6 +120,7 @@ class VPG(BatchPolopt, Serializable):
             inputs += (samples_data["valids"],)
         dist_info_list = [agent_infos[k] for k in self.policy.distribution.dist_info_keys]
         loss_before = self.optimizer.loss(inputs)
+        print(inputs[0].shape)
         self.optimizer.optimize(inputs)
         loss_after = self.optimizer.loss(inputs)
         logger.record_tabular("LossBefore", loss_before)

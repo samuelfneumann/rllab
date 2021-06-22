@@ -2,6 +2,7 @@ from rllab.algos.ddpg import DDPG
 from rllab.exploration_strategies.ou_strategy import OUStrategy
 from rllab.policies.deterministic_mlp_policy import DeterministicMLPPolicy
 from rllab.q_functions.continuous_mlp_q_function import ContinuousMLPQFunction
+from rllab.algos.vpg import VPG
 from rllab.algos.trpo import TRPO
 from rllab.baselines.linear_feature_baseline import LinearFeatureBaseline
 from rllab.policies.gaussian_mlp_policy import GaussianMLPPolicy
@@ -19,25 +20,49 @@ def get(perm, env):
     elif name.lower() == "trpo":
         return _create_trpo(hps, env)
 
+    elif name.lower() == "reinforce":
+        return _create_reinforce(hps, env)
+
     else:
         raise NotImplementedError("Agent", perm["agent"], "unknown")
+
+
+def _create_reinforce(hps, env):
+    baseline = LinearFeatureBaseline(env_spec=env.spec)
+
+    policy_weights = hps["policy_weights"]
+    policy = GaussianMLPPolicy(env_spec=env.spec, hidden_sizes=policy_weights)
+    stepsize = hps["stepsize"]
+
+    n_itr = hps["n_itr"]
+    max_path_length = hps["max_path_length"]
+    discount = hps["discount"]
+    batch_size = hps["batch_size"]
+
+    optimizer_args = {"learning_rate": stepsize,
+                      "batch_size": None,  # The whole episode is used
+                      }
+
+    return VPG(env, policy, baseline=baseline, discount=discount, n_itr=n_itr,
+               batch_size=batch_size, max_path_length=max_path_length,
+               optimizer_args=optimizer_args)
 
 
 def _create_trpo(hps, env):
     baseline = LinearFeatureBaseline(env_spec=env.spec)
 
-    policy_weights = hps["actor_weights"]
+    policy_weights = hps["policy_weights"]
     policy = GaussianMLPPolicy(env_spec=env.spec, hidden_sizes=policy_weights)
     stepsize = hps["stepsize"]
 
-    num_paths = hps["num_paths"]
+    batch_size = hps["batch_size"]
     n_itr = hps["n_itr"]
     max_path_length = hps["max_path_length"]
     discount = hps["discount"]
 
-    return TRPO(env, policy=policy, baseline=baseline,
+    return TRPO(env=env, policy=policy, baseline=baseline,
                 max_path_length=max_path_length, discount=discount,
-                step_size=stepsize, n_itr=n_itr, batch_size=num_paths)
+                step_size=stepsize, n_itr=n_itr, batch_size=batch_size)
 
 
 def _create_ddpg(hps, env):

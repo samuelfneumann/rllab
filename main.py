@@ -63,23 +63,24 @@ def run_task(*_):
     algo.train()
 
 
-start = time.time()
-run_experiment_lite(
-    run_task,
-    n_parallel=1,
-    snapshot_mode="last",
-    seed=run,
-    exp_name=exp_name(perm, run)
-)
-cpu_time = time.time() - start
+if __name__ == "__main__":
+    start = time.time()
+    run_experiment_lite(
+        run_task,
+        n_parallel=1,
+        snapshot_mode="last",
+        seed=run,
+        exp_name=exp_name(perm, run)
+    )
+    cpu_time = time.time() - start
 
-if not os.path.exists(f"./data/local/experiment/{exp_name(perm, run)}"):
-    os.mkdir(f"./data/local/experiment/{exp_name(perm)}")
+    if not os.path.exists(f"./data/local/experiment/{exp_name(perm, run)}"):
+        os.mkdir(f"./data/local/experiment/{exp_name(perm)}")
 
-file_ = f"./data/local/experiment/{exp_name(perm, run)}/config.json"
-with open(file_, "w") as outfile:
-    json.dump(perm, outfile, indent=4)
+    file_ = f"./data/local/experiment/{exp_name(perm, run)}/config.json"
+    with open(file_, "w") as outfile:
+        json.dump(perm, outfile, indent=4)
 
-file_ = f"./data/local/experiment/{exp_name(perm, run)}/cpu_time"
-with open(file_, "w") as outfile:
-    outfile.write(str(cpu_time))
+    file_ = f"./data/local/experiment/{exp_name(perm, run)}/cpu_time"
+    with open(file_, "w") as outfile:
+        outfile.write(str(cpu_time))
