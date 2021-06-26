@@ -1,7 +1,7 @@
 {
 	"agent": "trpo",
 	"problem": "cartpole",
-	"max_steps": 100000,
+	"max_steps": 25000000,
 	"metaParameters": {
 		"max_path_length": 500,
 		"batch_size": 50000,
