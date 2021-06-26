@@ -8,6 +8,10 @@ def get(perm):
         from rllab.envs.box2d.cartpole_env import CartpoleEnv
         return normalize(CartpoleEnv())
 
+    elif name.lower() == "mountain car height bonus":
+        from rllab.envs.box2d.mountain_car_env import MountainCarEnv
+        return normalize(MountainCarEnv())
+
     elif name.lower() == "mountain car":
         from rllab.envs.box2d.mountain_car_env import MountainCarEnv
         return normalize(MountainCarEnv(height_bonus=0))
