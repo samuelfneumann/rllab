@@ -2,6 +2,10 @@ data
 venv
 *.pyc
 .vscode
+*.zip
+*.png
+*.jpg
+*.jpeg
 *-checkpoint.ipynb
 .DS_Store
 *.h5
