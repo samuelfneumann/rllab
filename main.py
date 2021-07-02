@@ -46,6 +46,10 @@ def get_algo(perm, env, run):
         if perm["agent"] == "reinforce":
             with open(os.path.join(dir_, "progress0.csv"), "r") as infile:
                 completed_itr = int(infile.readlines()[-1].split(",")[0])
+<<<<<<< HEAD
+=======
+                print("COMPLETED:", completed_itr)
+>>>>>>> 27b8251c00af0cecd50183e7f65aa2ffcc096720
             algo.current_itr = completed_itr
 
         print("Current itr:", algo.current_itr, "\tN itr:", algo.n_itr)
