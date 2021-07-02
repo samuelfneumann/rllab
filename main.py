@@ -47,7 +47,7 @@ def get_algo(perm, env, run):
             with open(os.path.join(dir_, "progress0.csv"), "r") as infile:
                 completed_itr = int(infile.readlines()[-1].split(",")[0])
                 print("COMPLETED:", completed_itr)
-            algo.current_itr = completed_itr
+            algo.current_itr = completed_itr + 1
 
         print("Current itr:", algo.current_itr, "\tN itr:", algo.n_itr)
     else:
