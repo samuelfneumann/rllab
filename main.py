@@ -39,13 +39,14 @@ def first_int(filename):
 def get_algo(perm, env, run):
     name = exp_name(perm, run)
     dir_ = f"./data/local/experiment/{name}"
-    if os.path.exists(dir_):
+    if os.path.exists(os.path.join(dir_, "params.pkl")):
         algo = joblib.load(os.path.join(dir_, "params.pkl"))["algo"]
         algo.n_itr = perm["metaParameters"]["n_itr"]
 
         if perm["agent"] == "reinforce":
             with open(os.path.join(dir_, "progress0.csv"), "r") as infile:
-                completed_itr = len(infile.readlines()) - 1
+                completed_itr = int(infile.readlines()[-1].split(",")[0])
+                print("COMPLETED:", completed_itr)
             algo.current_itr = completed_itr
 
         print("Current itr:", algo.current_itr, "\tN itr:", algo.n_itr)
@@ -120,8 +121,6 @@ if __name__ == "__main__":
                 data = old.readlines()
             with open(os.path.join(dir_, "progress" + suffix + ".csv"), "w") as new:
                 new.writelines(data)
-
-        algo = joblib.load(os.path.join(dir_, "params.pkl"))["algo"]
 
     start = time.time()
     run_experiment_lite(
