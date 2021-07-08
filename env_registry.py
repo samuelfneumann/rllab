@@ -25,6 +25,10 @@ def get(perm):
         from rllab.envs.gym_env import GymEnv
         return normalize(GymEnv("Pendulum-v0", record_video=False))
 
+    elif name.lower() == "mujoco double pendulum":
+        from rllab.envs.mujoco.inverted_double_pendulum_env import InvertedDoublePendulumEnv
+        return normalize(InvertedDoublePendulumEnv())
+
     elif name.lower() == "double pendulum":
         from rllab.envs.box2d.double_pendulum_env import DoublePendulumEnv
         return normalize(DoublePendulumEnv())
