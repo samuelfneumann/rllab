@@ -1,4 +1,5 @@
 import time
+from copy import deepcopy
 import sys
 import os
 sys.path.append(os.getcwd() + '/src')
@@ -24,8 +25,6 @@ if len(sys.argv) < 4:
 cwd = os.getcwd()
 def getJobScript(parallel):
     return f"""#!/bin/bash
-#SBATCH --gres=gpu:1
-
 cd {cwd}
 module load python/3.7
 module load cuda
@@ -57,7 +56,8 @@ def printProgress(size, it):
         yield _
 
 def exp_name(perm, run):
-    hps = perm["metaParameters"]
+    hps = deepcopy(perm["metaParameters"])
+    hps["n_itr"] = 500
     agent = perm["agent"]
     env = perm["problem"]
     hp_list = list(map(lambda x: str(x), hps.values()))
@@ -95,10 +95,21 @@ def gatherMissing(experiment_paths, runs, groupSize, cores, total_hours):
 
         for i in range(numPerms * runs):
             perm = exp.getPermutation(i)
-            run = i % numPerms
+            run = i // numPerms
             name = exp_name(perm, run)
-            if not os.path.exists(f"./data/local/experiment/{name}"):
+            dataPath = f"./data/local/experiment/{name}"
+
+            if not os.path.exists(dataPath):
+                print(dataPath)
                 indices.append(i)
+                continue
+
+            with open(os.path.join(dataPath, "progress.csv")) as infile:
+                #if not os.path.exists(f"./data/local/experiment/{name}/cpu_time"):
+                lines = infile.readlines()
+                if len(lines) < 500001:
+                    print(path, i, dataPath)
+                    indices.append(i)
 
         indices = sorted(indices)
         out[path] = indices
@@ -152,7 +163,7 @@ for path in missing:
         # we need it in the form parallel 'CUDA_VISIBLE_DEVICES=$(({%} - 1)); python src/dm_control.py experiments/benchmark/DMCartPole/DDPG/json {}' ::: 0 1 2 3 4 5 ...
         i = parallel.index("python")
         j = parallel.index(":")
-        parallel = parallel[:i] + " 'CUDA_VISIBLE_DEVICES=$(({%} - 1)); " + parallel[i:j-1] + "{}' " + parallel[j:]
+        #parallel = parallel[:i] + " 'CUDA_VISIBLE_DEVICES=$(({%} - 1)); " + parallel[i:j-1] + "{}' " + parallel[j:]
         print(parallel)
         script = getJobScript(parallel)
 

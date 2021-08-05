@@ -1,8 +1,8 @@
 {
     "account": "rrg-whitem",
-    "time": "12:00:00",
+    "time": "3:00:00",
     "nodes": 1,
     "cores": 4,
     "sequential": 1,
-    "memPerCpu": "4G"
+    "memPerCpu": "2G"
 }
